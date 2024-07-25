@@ -3,6 +3,8 @@ import torch
 
 from helpers import list_of_distances, make_one_hot
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l1_mask=True,
                    coefs=None, log=print):
     '''
@@ -22,8 +24,8 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
     total_avg_separation_cost = 0
 
     for i, (image, label) in enumerate(dataloader):
-        input = image.cuda()
-        target = label.cuda()
+        input = image.to(device)
+        target = label.to(device)
 
         # torch.enable_grad() has no effect outside of no_grad()
         grad_req = torch.enable_grad() if is_train else torch.no_grad()
@@ -42,7 +44,7 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
 
                 # prototypes_of_correct_class is a tensor of shape batch_size * num_prototypes
                 # calculate cluster cost
-                prototypes_of_correct_class = torch.t(model.module.prototype_class_identity[:,label]).cuda()
+                prototypes_of_correct_class = torch.t(model.module.prototype_class_identity[:,label]).to(device)
                 inverted_distances, _ = torch.max((max_dist - min_distances) * prototypes_of_correct_class, dim=1)
                 cluster_cost = torch.mean(max_dist - inverted_distances)
 
@@ -58,7 +60,7 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
                 avg_separation_cost = torch.mean(avg_separation_cost)
                 
                 if use_l1_mask:
-                    l1_mask = 1 - torch.t(model.module.prototype_class_identity).cuda()
+                    l1_mask = 1 - torch.t(model.module.prototype_class_identity).to(device)
                     l1 = (model.module.last_layer.weight * l1_mask).norm(p=1)
                 else:
                     l1 = model.module.last_layer.weight.norm(p=1) 
