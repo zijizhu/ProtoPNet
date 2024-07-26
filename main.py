@@ -38,6 +38,12 @@ if __name__ == "__main__":
     elif args.setting == 2:
         from settings2 import base_architecture, img_size, prototype_shape, num_classes, \
                             prototype_activation_function, add_on_layers_type, experiment_run
+    elif args.setting == 3:
+        from settings3 import base_architecture, img_size, prototype_shape, num_classes, \
+                            prototype_activation_function, add_on_layers_type, experiment_run
+    elif args.setting == 4:
+        from settings4 import base_architecture, img_size, prototype_shape, num_classes, \
+                            prototype_activation_function, add_on_layers_type, experiment_run
     else:
         raise NotImplementedError
 
@@ -116,6 +122,7 @@ if __name__ == "__main__":
     #if prototype_activation_function == 'linear':
     #    ppnet.set_last_layer_incorrect_connection(incorrect_strength=0)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("device:", device)
     ppnet = ppnet.to(device)
     ppnet_multi = torch.nn.DataParallel(ppnet)
     class_specific = True
