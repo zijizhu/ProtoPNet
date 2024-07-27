@@ -3,9 +3,9 @@ img_size = 224
 prototype_shape = (2000, 128, 1, 1)
 num_classes = 200
 prototype_activation_function = 'log'
-add_on_layers_type = 'regular'
+add_on_layers_type = 'bottleneck'
 
-experiment_run = '128'
+experiment_run = '128-bottleneck'
 
 data_path = './datasets/cub200_cropped/'
 train_dir = data_path + 'train_cropped_augmented/'
@@ -32,7 +32,7 @@ coefs = {
     'l1': 1e-4,
 }
 
-num_train_epochs = 31
+num_train_epochs = 21
 num_warm_epochs = 5
 
 push_start = 10

@@ -1,11 +1,11 @@
 base_architecture = 'densenet121'
 img_size = 224
-prototype_shape = (2000, 512, 1, 1)
+prototype_shape = (2000, 128, 1, 1)
 num_classes = 200
-prototype_activation_function = 'log'
+prototype_activation_function = 'linear'
 add_on_layers_type = 'regular'
 
-experiment_run = '512'
+experiment_run = '128-linear'
 
 data_path = './datasets/cub200_cropped/'
 train_dir = data_path + 'train_cropped_augmented/'
@@ -32,7 +32,7 @@ coefs = {
     'l1': 1e-4,
 }
 
-num_train_epochs = 31
+num_train_epochs = 21
 num_warm_epochs = 5
 
 push_start = 10
