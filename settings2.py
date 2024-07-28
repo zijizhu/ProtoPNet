@@ -1,3 +1,4 @@
+seed = 42
 base_architecture = 'densenet121'
 img_size = 224
 prototype_shape = (2000, 128, 1, 1)
@@ -32,7 +33,7 @@ coefs = {
     'l1': 1e-4,
 }
 
-num_train_epochs = 21
+num_train_epochs = 31
 num_warm_epochs = 5
 
 push_start = 10

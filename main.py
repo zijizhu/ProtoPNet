@@ -19,7 +19,10 @@ import save
 from log import create_logger
 from preprocess import mean, std, preprocess_input_function
 
+from lightning import seed_everything
+
 if __name__ == "__main__":
+    seed_everything(42)
     parser = argparse.ArgumentParser()
     parser.add_argument('-gpuid', nargs=1, type=str, default='0') # python3 main.py -gpuid=0,1,2,3
     parser.add_argument('-setting', type=int, default=0)
@@ -35,37 +38,39 @@ if __name__ == "__main__":
                             train_dir, train_push_dir, train_push_batch_size, push_epochs, \
                             num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
                             test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
-                            joint_lr_step_size, push_start
+                            joint_lr_step_size, push_start, seed
     elif args.setting == 1:
         from settings1 import base_architecture, img_size, prototype_shape, num_classes, \
                             prototype_activation_function, add_on_layers_type, experiment_run, \
                             train_dir, train_push_dir, train_push_batch_size, push_epochs, \
                             num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
                             test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
-                            joint_lr_step_size, push_start
+                            joint_lr_step_size, push_start, seed
     elif args.setting == 2:
         from settings2 import base_architecture, img_size, prototype_shape, num_classes, \
                             prototype_activation_function, add_on_layers_type, experiment_run, \
                             train_dir, train_push_dir, train_push_batch_size, push_epochs, \
                             num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
                             test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
-                            joint_lr_step_size, push_start
+                            joint_lr_step_size, push_start, seed
     elif args.setting == 3:
         from settings3 import base_architecture, img_size, prototype_shape, num_classes, \
                             prototype_activation_function, add_on_layers_type, experiment_run, \
                             train_dir, train_push_dir, train_push_batch_size, push_epochs, \
                             num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
                             test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
-                            joint_lr_step_size, push_start
+                            joint_lr_step_size, push_start, seed
     elif args.setting == 4:
         from settings4 import base_architecture, img_size, prototype_shape, num_classes, \
                             prototype_activation_function, add_on_layers_type, experiment_run, \
                             train_dir, train_push_dir, train_push_batch_size, push_epochs, \
                             num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
                             test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
-                            joint_lr_step_size, push_start
+                            joint_lr_step_size, push_start, seed
     else:
         raise NotImplementedError
+    
+    seed_everything(seed)
 
     base_architecture_type = re.match('^[a-z]*', base_architecture).group(0)
 
