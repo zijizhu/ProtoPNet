@@ -31,19 +31,39 @@ if __name__ == "__main__":
     print(args.setting, type(args.setting))
     if args.setting == 0:
         from settings import base_architecture, img_size, prototype_shape, num_classes, \
-                            prototype_activation_function, add_on_layers_type, experiment_run
+                            prototype_activation_function, add_on_layers_type, experiment_run, \
+                            train_dir, train_push_dir, train_push_batch_size, push_epochs, \
+                            num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
+                            test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
+                            joint_lr_step_size, push_start
     elif args.setting == 1:
         from settings1 import base_architecture, img_size, prototype_shape, num_classes, \
-                            prototype_activation_function, add_on_layers_type, experiment_run
+                            prototype_activation_function, add_on_layers_type, experiment_run, \
+                            train_dir, train_push_dir, train_push_batch_size, push_epochs, \
+                            num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
+                            test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
+                            joint_lr_step_size, push_start
     elif args.setting == 2:
         from settings2 import base_architecture, img_size, prototype_shape, num_classes, \
-                            prototype_activation_function, add_on_layers_type, experiment_run
+                            prototype_activation_function, add_on_layers_type, experiment_run, \
+                            train_dir, train_push_dir, train_push_batch_size, push_epochs, \
+                            num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
+                            test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
+                            joint_lr_step_size, push_start
     elif args.setting == 3:
         from settings3 import base_architecture, img_size, prototype_shape, num_classes, \
-                            prototype_activation_function, add_on_layers_type, experiment_run
+                            prototype_activation_function, add_on_layers_type, experiment_run, \
+                            train_dir, train_push_dir, train_push_batch_size, push_epochs, \
+                            num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
+                            test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
+                            joint_lr_step_size, push_start
     elif args.setting == 4:
         from settings4 import base_architecture, img_size, prototype_shape, num_classes, \
-                            prototype_activation_function, add_on_layers_type, experiment_run
+                            prototype_activation_function, add_on_layers_type, experiment_run, \
+                            train_dir, train_push_dir, train_push_batch_size, push_epochs, \
+                            num_warm_epochs, num_train_epochs, train_batch_size, test_batch_size, \
+                            test_dir, coefs, joint_optimizer_lrs, warm_optimizer_lrs, last_layer_optimizer_lr, \
+                            joint_lr_step_size, push_start
     else:
         raise NotImplementedError
 
@@ -64,10 +84,6 @@ if __name__ == "__main__":
     prototype_img_filename_prefix = 'prototype-img'
     prototype_self_act_filename_prefix = 'prototype-self-act'
     proto_bound_boxes_filename_prefix = 'bb'
-
-    # load the data
-    from settings import train_dir, test_dir, train_push_dir, \
-                        train_batch_size, test_batch_size, train_push_batch_size
 
     normalize = transforms.Normalize(mean=mean,
                                     std=std)
@@ -128,7 +144,6 @@ if __name__ == "__main__":
     class_specific = True
 
     # define optimizer
-    from settings import joint_optimizer_lrs, joint_lr_step_size
     joint_optimizer_specs = \
     [{'params': ppnet.features.parameters(), 'lr': joint_optimizer_lrs['features'], 'weight_decay': 1e-3}, # bias are now also being regularized
     {'params': ppnet.add_on_layers.parameters(), 'lr': joint_optimizer_lrs['add_on_layers'], 'weight_decay': 1e-3},
@@ -147,12 +162,6 @@ if __name__ == "__main__":
     from settings import last_layer_optimizer_lr
     last_layer_optimizer_specs = [{'params': ppnet.last_layer.parameters(), 'lr': last_layer_optimizer_lr}]
     last_layer_optimizer = torch.optim.Adam(last_layer_optimizer_specs)
-
-    # weighting of different training losses
-    from settings import coefs
-
-    # number of training epochs, number of warm epochs, push start epoch, push epochs
-    from settings import num_train_epochs, num_warm_epochs, push_start, push_epochs
 
     # train the model
     log('start training')
