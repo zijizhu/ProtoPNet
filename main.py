@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     base_architecture_type = re.match('^[a-z]*', base_architecture).group(0)
 
-    model_dir = './saved_models/' + base_architecture + '/' + experiment_run + '/'
+    model_dir = './saved_models/' + base_architecture + '/'
     makedir(model_dir)
     shutil.copy(src=os.path.join(os.getcwd(), __file__), dst=model_dir)
     shutil.copy(src=os.path.join(os.getcwd(), 'settings.py'), dst=model_dir)
