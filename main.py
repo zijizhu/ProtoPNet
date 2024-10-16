@@ -22,13 +22,16 @@ from preprocess import mean, std, preprocess_input_function
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-gpuid', nargs=1, type=str, default='0') # python3 main.py -gpuid=0,1,2,3
+    parser.add_argument('-arch',type=str, default='vgg19')
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpuid[0]
     print(os.environ['CUDA_VISIBLE_DEVICES'])
 
     # book keeping namings and code
-    from settings import base_architecture, img_size, prototype_shape, num_classes, \
+    from settings import img_size, prototype_shape, num_classes, \
                         prototype_activation_function, add_on_layers_type, experiment_run
+    
+    base_architecture = args.arch
 
     base_architecture_type = re.match('^[a-z]*', base_architecture).group(0)
 
@@ -36,7 +39,7 @@ if __name__ == "__main__":
     makedir(model_dir)
     shutil.copy(src=os.path.join(os.getcwd(), __file__), dst=model_dir)
     shutil.copy(src=os.path.join(os.getcwd(), 'settings.py'), dst=model_dir)
-    shutil.copy(src=os.path.join(os.getcwd(), base_architecture_type + '_features.py'), dst=model_dir)
+    # shutil.copy(src=os.path.join(os.getcwd(), base_architecture_type + '_features.py'), dst=model_dir)
     shutil.copy(src=os.path.join(os.getcwd(), 'model.py'), dst=model_dir)
     shutil.copy(src=os.path.join(os.getcwd(), 'train_and_test.py'), dst=model_dir)
 
@@ -137,6 +140,7 @@ if __name__ == "__main__":
 
     # train the model
     log('start training')
+    max_accu = 0.0
     import copy
     for epoch in range(num_train_epochs):
         log('epoch: \t{0}'.format(epoch))
@@ -153,8 +157,10 @@ if __name__ == "__main__":
 
         accu = tnt.test(model=ppnet_multi, dataloader=test_loader,
                         class_specific=class_specific, log=log)
-        save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'nopush', accu=accu,
-                                    target_accu=0.70, log=log)
+        if accu >= max_accu:
+            save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'nopush', accu=accu,
+                                        target_accu=0.70, log=log)
+            max_accu = accu
 
         if epoch >= push_start and epoch in push_epochs:
             push.push_prototypes(
@@ -172,8 +178,10 @@ if __name__ == "__main__":
                 log=log)
             accu = tnt.test(model=ppnet_multi, dataloader=test_loader,
                             class_specific=class_specific, log=log)
-            save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'push', accu=accu,
-                                        target_accu=0.70, log=log)
+            if accu >= max_accu:
+                save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'push', accu=accu,
+                                            target_accu=0.70, log=log)
+                max_accu = accu
 
             if prototype_activation_function != 'linear':
                 tnt.last_only(model=ppnet_multi, log=log)
@@ -183,8 +191,9 @@ if __name__ == "__main__":
                                 class_specific=class_specific, coefs=coefs, log=log)
                     accu = tnt.test(model=ppnet_multi, dataloader=test_loader,
                                     class_specific=class_specific, log=log)
-                    save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + '_' + str(i) + 'push', accu=accu,
-                                                target_accu=0.70, log=log)
+                    if accu >= max_accu:
+                        save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + '_' + str(i) + 'push', accu=accu,
+                                                    target_accu=0.70, log=log)
+                        max_accu = accu
     
     logclose()
-

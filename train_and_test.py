@@ -167,8 +167,11 @@ def warm_only(model, log=print):
 
 
 def joint(model, log=print):
-    for p in model.module.features.parameters():
-        p.requires_grad = True
+    if str(model.module.features).upper().startswith("DINOV2"):
+        model.module.features.set_requires_grad()
+    else:
+        for p in model.module.features.parameters():
+            p.requires_grad = True
     for p in model.module.add_on_layers.parameters():
         p.requires_grad = True
     model.module.prototype_vectors.requires_grad = True

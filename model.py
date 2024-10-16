@@ -1,3 +1,4 @@
+from functools import partial
 import torch
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
@@ -7,6 +8,7 @@ from resnet_features import resnet18_features, resnet34_features, resnet50_featu
 from densenet_features import densenet121_features, densenet161_features, densenet169_features, densenet201_features
 from vgg_features import vgg11_features, vgg11_bn_features, vgg13_features, vgg13_bn_features, vgg16_features, vgg16_bn_features,\
                          vgg19_features, vgg19_bn_features
+from vit_features import DINOv2BackboneExpanded
 
 from receptive_field import compute_proto_layer_rf_info_v2
 
@@ -26,7 +28,11 @@ base_architecture_to_features = {'resnet18': resnet18_features,
                                  'vgg16': vgg16_features,
                                  'vgg16_bn': vgg16_bn_features,
                                  'vgg19': vgg19_features,
-                                 'vgg19_bn': vgg19_bn_features}
+                                 'vgg19_bn': vgg19_bn_features,
+                                 'dinov2_vits_exp': partial(DINOv2BackboneExpanded, name="dinov2_vits14_reg4", n_splits=3),
+                                 'dinov2_vitb_exp': partial(DINOv2BackboneExpanded, name="dinov2_vitb14_reg4", n_splits=3),
+                                 'clip_vitb/32': None,
+                                 'clip_vitb/16': None}
 
 class PPNet(nn.Module):
 
@@ -72,6 +78,10 @@ class PPNet(nn.Module):
         elif features_name.startswith('DENSE'):
             first_add_on_layer_in_channels = \
                 [i for i in features.modules() if isinstance(i, nn.BatchNorm2d)][-1].num_features
+        elif features_name == "DINOV2_VITS14_REG4":
+            first_add_on_layer_in_channels = 384
+        elif features_name == "DINOV2_VITB14_REG4":
+            first_add_on_layer_in_channels = 768
         else:
             raise Exception('other base base_architecture NOT implemented')
 
@@ -290,12 +300,15 @@ def construct_PPNet(base_architecture, pretrained=True, img_size=224,
                     prototype_activation_function='log',
                     add_on_layers_type='bottleneck'):
     features = base_architecture_to_features[base_architecture](pretrained=pretrained)
-    layer_filter_sizes, layer_strides, layer_paddings = features.conv_info()
-    proto_layer_rf_info = compute_proto_layer_rf_info_v2(img_size=img_size,
-                                                         layer_filter_sizes=layer_filter_sizes,
-                                                         layer_strides=layer_strides,
-                                                         layer_paddings=layer_paddings,
-                                                         prototype_kernel_size=prototype_shape[2])
+    if str(base_architecture).upper().startswith("DINOV2"):
+        proto_layer_rf_info = None
+    else:
+        layer_filter_sizes, layer_strides, layer_paddings = features.conv_info()
+        proto_layer_rf_info = compute_proto_layer_rf_info_v2(img_size=img_size,#224
+                                                            layer_filter_sizes=layer_filter_sizes,#
+                                                            layer_strides=layer_strides,
+                                                            layer_paddings=layer_paddings,
+                                                            prototype_kernel_size=prototype_shape[2])
     return PPNet(features=features,
                  img_size=img_size,
                  prototype_shape=prototype_shape,
