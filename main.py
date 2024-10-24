@@ -23,6 +23,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-gpuid', nargs=1, type=str, default='0') # python3 main.py -gpuid=0,1,2,3
     parser.add_argument('-arch',type=str, default='vgg19')
+    parser.add_argument('-num_prototypes',type=int,default=2000)
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpuid[0]
     print(os.environ['CUDA_VISIBLE_DEVICES'])
@@ -30,6 +31,8 @@ if __name__ == "__main__":
     # book keeping namings and code
     from settings import img_size, prototype_shape, num_classes, \
                         prototype_activation_function, add_on_layers_type, experiment_run
+    assert args.num_prototypes in [1000, 2000]
+    prototype_shape[0] = args.num_prototypes
     
     base_architecture = args.arch
 
