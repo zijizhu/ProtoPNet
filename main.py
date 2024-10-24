@@ -33,6 +33,7 @@ if __name__ == "__main__":
                         prototype_activation_function, add_on_layers_type, experiment_run
     assert args.num_prototypes in [1000, 2000]
     prototype_shape[0] = args.num_prototypes
+    prototype_shape = tuple(prototype_shape)
     
     base_architecture = args.arch
 
