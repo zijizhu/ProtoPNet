@@ -31,7 +31,7 @@ if __name__ == "__main__":
     # book keeping namings and code
     from settings import img_size, prototype_shape, num_classes, \
                         prototype_activation_function, add_on_layers_type, experiment_run
-    assert args.num_prototypes in [1000, 2000]
+    assert args.num_prototypes in [600, 1000, 2000]
     prototype_shape[0] = args.num_prototypes
     prototype_shape = tuple(prototype_shape)
     

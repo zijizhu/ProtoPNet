@@ -8,7 +8,7 @@ from resnet_features import resnet18_features, resnet34_features, resnet50_featu
 from densenet_features import densenet121_features, densenet161_features, densenet169_features, densenet201_features
 from vgg_features import vgg11_features, vgg11_bn_features, vgg13_features, vgg13_bn_features, vgg16_features, vgg16_bn_features,\
                          vgg19_features, vgg19_bn_features
-from vit_features import DINOv2BackboneExpanded
+from vit_features import DINOv2BackboneExpanded, DINOBackboneExpanded
 
 from receptive_field import compute_proto_layer_rf_info_v2
 
@@ -31,8 +31,12 @@ base_architecture_to_features = {'resnet18': resnet18_features,
                                  'vgg19_bn': vgg19_bn_features,
                                  'dinov2_vits_exp': partial(DINOv2BackboneExpanded, name="dinov2_vits14_reg4", n_splits=3),
                                  'dinov2_vitb_exp': partial(DINOv2BackboneExpanded, name="dinov2_vitb14_reg4", n_splits=3),
-                                 'clip_vitb/32': None,
-                                 'clip_vitb/16': None}
+
+                                 'dino_vits16': partial(DINOBackboneExpanded, name="dino_vits16", n_splits=3),
+                                 'dino_vits8': partial(DINOBackboneExpanded, name="dino_vits8", n_splits=3),
+                                 'dino_vitb16': partial(DINOBackboneExpanded, name="dino_vitb16", n_splits=3),
+                                 'dino_vitb8': partial(DINOBackboneExpanded, name="dino_vitb8", n_splits=3)
+                                 }
 
 class PPNet(nn.Module):
 
@@ -81,6 +85,12 @@ class PPNet(nn.Module):
         elif features_name == "DINOV2_VITS14_REG4":
             first_add_on_layer_in_channels = 384
         elif features_name == "DINOV2_VITB14_REG4":
+            first_add_on_layer_in_channels = 768
+        elif features_name.startswith('DINO_VITS'):
+            self.shallow_layer_idx = 0
+            first_add_on_layer_in_channels = 384
+        elif features_name.startswith('DINO_VITB'):
+            self.shallow_layer_idx = 0
             first_add_on_layer_in_channels = 768
         else:
             raise Exception('other base base_architecture NOT implemented')
