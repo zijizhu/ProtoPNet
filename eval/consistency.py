@@ -59,7 +59,7 @@ def get_corresponding_object_parts(ppnet, args, half_size, use_noise=False):
         proto_indices = proto_indices[:, :, None, None].repeat(1, 1, fea_size, fea_size)
         proto_acts = torch.gather(proto_acts, 1, proto_indices) # (B, proto_per_class, fea_size, fea_size)
 
-        all_proto_acts.append(proto_acts.cpu().detach())
+        all_proto_acts.append(proto_acts.detach().cpu())
         all_targets.append(targets.cpu())
         all_img_ids.append(img_ids)
     all_proto_acts = torch.cat(all_proto_acts, dim=0).numpy()   # The activation maps of all test images
