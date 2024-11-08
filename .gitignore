@@ -3,3 +3,6 @@ __pycache__
 pretrained_models
 saved_models
 logs
+out/
+*.pth
+*.ipynb

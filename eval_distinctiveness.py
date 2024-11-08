@@ -6,6 +6,7 @@ import logging
 import sys
 import argparse
 from eval.distinctiveness import evaluate_distinctiveness
+from eval.comprehensiveness import evaluate_comprehensiveness
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -66,3 +67,4 @@ if __name__ == "__main__":
 
 
     evaluate_distinctiveness(ppnet, save_path=log_dir, device=device)
+    evaluate_comprehensiveness(ppnet, save_path=log_dir, device=device)
