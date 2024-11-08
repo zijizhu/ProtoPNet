@@ -17,7 +17,8 @@ from torchvision.io import read_image
 from torchvision.transforms.functional import InterpolationMode, resized_crop
 from tqdm import tqdm
 
-from .utils import mean, std
+mean = (0.485, 0.456, 0.406)
+std = (0.229, 0.224, 0.225)
 
 logger = getLogger(__name__)
 
