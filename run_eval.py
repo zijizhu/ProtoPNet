@@ -30,6 +30,7 @@ if __name__ == "__main__":
     checkpoint = torch.load(args.resume, map_location='cpu')
     # ppnet.load_state_dict(checkpoint)
     ppnet = checkpoint
+    ppnet.num_prototypes_per_class = 2000
 
     ppnet.to(device)
     ppnet.eval()
