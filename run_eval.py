@@ -2,6 +2,7 @@ from pathlib import Path
 import model
 import torch
 import argparse
+from eval.accuracy import evaluate_accuracy
 from eval.stability import evaluate_stability
 from eval.consistency import evaluate_consistency
     
@@ -32,6 +33,8 @@ if __name__ == "__main__":
 
     ppnet.to(device)
     ppnet.eval()
+
+    evaluate_accuracy(net=ppnet, device=device)
 
     consistency_score = evaluate_consistency(ppnet, args, save_dir=output_path.as_posix())
     print('Consistency Score : {:.2f}%'.format(consistency_score))
