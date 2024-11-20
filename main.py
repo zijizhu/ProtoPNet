@@ -24,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('-gpuid', nargs=1, type=str, default='0') # python3 main.py -gpuid=0,1,2,3
     parser.add_argument('-arch',type=str, default='vgg19')
     parser.add_argument('-num_prototypes',type=int,default=2000)
+    parser.add_argument('-dataset', type=str, choices=["cars", "dogs", "cub"])
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpuid[0]
     print(os.environ['CUDA_VISIBLE_DEVICES'])
@@ -65,34 +66,90 @@ if __name__ == "__main__":
 
     # all datasets
     # train set
-    train_dataset = datasets.ImageFolder(
-        train_dir,
-        transforms.Compose([
-            transforms.Resize(size=(img_size, img_size)),
-            transforms.ToTensor(),
-            normalize,
-        ]))
+    if args.dataset == "cub":
+        train_dataset = datasets.ImageFolder(
+            train_dir,
+            transforms.Compose([
+                transforms.Resize(size=(img_size, img_size)),
+                transforms.ToTensor(),
+                normalize,
+            ]))
+        train_push_dataset = datasets.ImageFolder(
+            train_push_dir,
+            transforms.Compose([
+                transforms.Resize(size=(img_size, img_size)),
+                transforms.ToTensor(),
+            ]))
+        test_dataset = datasets.ImageFolder(
+            test_dir,
+            transforms.Compose([
+                transforms.Resize(size=(img_size, img_size)),
+                transforms.ToTensor(),
+                normalize,
+            ]))
+    elif args.dataset == "cars":
+        data_dir = "datasets/"
+        train_dataset = datasets.StanfordCars(
+            data_dir, split="train", download=False,
+            transform= transforms.Compose([
+                transforms.Resize(size=(img_size, img_size)),
+                transforms.ToTensor(),
+                normalize,
+            ])
+        )
+        train_push_dataset = datasets.StanfordCars(
+            data_dir, split="train", download=False,
+            transform= transforms.Compose([
+                transforms.Resize(size=(img_size, img_size)),
+                transforms.ToTensor(),
+                normalize,
+            ])
+        )
+        test_dataset = datasets.StanfordCars(
+            data_dir, split="test", download=False,
+            transform= transforms.Compose([
+                transforms.Resize(size=(img_size, img_size)),
+                transforms.ToTensor(),
+                normalize,
+            ])
+        )
+    elif args.dataset == "dogs":
+        from data import DogsDataset
+        train_dataset = DogsDataset(
+            root="datasets", split="train",
+            transform= transforms.Compose([
+                transforms.Resize(size=(img_size, img_size)),
+                transforms.ToTensor(),
+                normalize,
+            ])
+        )
+        train_push_dataset = DogsDataset(
+            root="datasets", split="train",
+            transform= transforms.Compose([
+                transforms.Resize(size=(img_size, img_size)),
+                transforms.ToTensor(),
+                normalize,
+            ])
+        )
+        test_dataset = DogsDataset(
+            root="datasets", split="test",
+            transform= transforms.Compose([
+                transforms.Resize(size=(img_size, img_size)),
+                transforms.ToTensor(),
+                normalize,
+            ])
+        )
+    else:
+        raise NotImplementedError
+    
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=train_batch_size, shuffle=True,
         num_workers=4, pin_memory=False)
     # push set
-    train_push_dataset = datasets.ImageFolder(
-        train_push_dir,
-        transforms.Compose([
-            transforms.Resize(size=(img_size, img_size)),
-            transforms.ToTensor(),
-        ]))
     train_push_loader = torch.utils.data.DataLoader(
         train_push_dataset, batch_size=train_push_batch_size, shuffle=False,
         num_workers=4, pin_memory=False)
     # test set
-    test_dataset = datasets.ImageFolder(
-        test_dir,
-        transforms.Compose([
-            transforms.Resize(size=(img_size, img_size)),
-            transforms.ToTensor(),
-            normalize,
-        ]))
     test_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=test_batch_size, shuffle=False,
         num_workers=4, pin_memory=False)
