@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     base_architecture_type = re.match('^[a-z]*', base_architecture).group(0)
 
-    model_dir = os.path.join('saved_models', base_architecture, f"{args.dataset}-{args.num_prototypes}-prototypes")
+    model_dir = os.path.join('saved_models', f"{base_architecture}-{args.dataset}-{args.num_prototypes}-prototypes")
 
     makedir(model_dir)
     shutil.copy(src=os.path.join(os.getcwd(), __file__), dst=model_dir)
