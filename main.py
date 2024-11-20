@@ -24,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('-gpuid', nargs=1, type=str, default='0') # python3 main.py -gpuid=0,1,2,3
     parser.add_argument('-arch',type=str, default='vgg19')
     parser.add_argument('-num_prototypes',type=int,default=2000)
-    parser.add_argument('-dataset', type=str, choices=["cars", "dogs", "cub"])
+    parser.add_argument('-dataset', type=str, choices=["cars", "dogs", "cub"], default="cub")
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpuid[0]
     print(os.environ['CUDA_VISIBLE_DEVICES'])
@@ -241,8 +241,9 @@ if __name__ == "__main__":
             accu = tnt.test(model=ppnet_multi, dataloader=test_loader,
                             class_specific=class_specific, log=log)
             if accu >= max_accu:
-                save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'push', accu=accu,
-                                            target_accu=0.70, log=log)
+                if args.dataset == "cub":
+                    save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'push', accu=accu,
+                                                target_accu=0.70, log=log)
                 max_accu = accu
 
             if prototype_activation_function != 'linear':
@@ -254,8 +255,9 @@ if __name__ == "__main__":
                     accu = tnt.test(model=ppnet_multi, dataloader=test_loader,
                                     class_specific=class_specific, log=log)
                     if accu >= max_accu:
-                        save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + '_' + str(i) + 'push', accu=accu,
-                                                    target_accu=0.70, log=log)
+                        if args.dataset == "cub":
+                            save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + '_' + str(i) + 'push', accu=accu,
+                                                        target_accu=0.70, log=log)
                         max_accu = accu
-    
+    log(f"max test accuracy: {max_accu:.4f}")
     logclose()
