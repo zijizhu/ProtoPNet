@@ -224,8 +224,9 @@ if __name__ == "__main__":
         accu = tnt.test(model=ppnet_multi, dataloader=test_loader,
                         class_specific=class_specific, log=log)
         if accu >= max_accu:
-            save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'nopush', accu=accu,
-                                        target_accu=0.70, log=log)
+            if args.dataset == "cub":
+                save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'nopush', accu=accu,
+                                            target_accu=0.70, log=log)
             max_accu = accu
 
         if epoch >= push_start and epoch in push_epochs:
