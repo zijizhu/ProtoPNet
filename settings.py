@@ -35,5 +35,5 @@ coefs = {
 num_train_epochs = 50
 num_warm_epochs = 10
 
-push_start = 200
+push_start = 20
 push_epochs = [i for i in range(num_train_epochs) if i % 10 == 0]
